@@ -1,15 +1,15 @@
-# IndiBench: A Benchmark for Regional Weather Forecasting over the Indian Subcontinent
+# IndiaWeatherBench: A Benchmark for Regional Weather Forecasting over the Indian Subcontinent
 
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![HuggingFace](https://img.shields.io/badge/🤗-Datasets-yellow.svg)](https://huggingface.co/datasets/tungnd/indibench)
+[![HuggingFace](https://img.shields.io/badge/🤗-Datasets-yellow.svg)](https://huggingface.co/datasets/tungnd/IndiaWeatherBench)
 
 ## 🌏 Overview
 
-**IndiBench** is a comprehensive benchmark for data-driven regional weather forecasting focused on the Indian subcontinent. While machine learning has shown impressive progress in global weather forecasting, regional forecasting remains comparatively underexplored. This benchmark provides a curated dataset built from high-resolution regional reanalysis products (specifically IMDAA), along with a suite of strong baselines and standard metrics to facilitate consistent training and evaluation of ML models for regional weather prediction.
+**IndiaWeatherBench** is a comprehensive benchmark for data-driven regional weather forecasting focused on the Indian subcontinent. While machine learning has shown impressive progress in global weather forecasting, regional forecasting remains comparatively underexplored. This benchmark provides a curated dataset built from high-resolution regional reanalysis products (specifically IMDAA), along with a suite of strong baselines and standard metrics to facilitate consistent training and evaluation of ML models for regional weather prediction.
 
 ## 📦 Dataset
 
-IndiBench provides a curated benchmark dataset built from the Indian Monsoon Data Assimilation and Analysis (IMDAA) reanalysis dataset, which was produced under the National Monsoon Mission by NCMRWF, UK Met Office, and IMD.
+IndiaWeatherBench provides a curated benchmark dataset built from the Indian Monsoon Data Assimilation and Analysis (IMDAA) reanalysis dataset, which was produced under the National Monsoon Mission by NCMRWF, UK Met Office, and IMD.
 
 - **Time range**: 2000–2019 (20 years)
 - **Interval**: 6-hourly (00, 06, 12, 18 UTC)
@@ -25,7 +25,7 @@ IndiBench provides a curated benchmark dataset built from the Indian Monsoon Dat
 
 ### Data Formats
 
-IndiBench is released in two formats:
+IndiaWeatherBench is released in two formats:
 
 #### Zarr Format
 - Chunked, cloud-native array storage
@@ -52,12 +52,12 @@ print(list(f.keys()))
 
 ```bash
 # Clone repository
-git clone https://github.com/tung-nd/IndiBench.git
-cd IndiBench
+git clone https://github.com/tung-nd/IndiaWeatherBench.git
+cd IndiaWeatherBench
 
 # Create conda environment
 conda env create -f environment.yml
-conda activate indibench
+conda activate IndiaWeatherBench
 
 # Install package in development mode
 pip install -e .
@@ -67,7 +67,7 @@ pip install -e .
 
 ### Training Models
 
-IndiBench includes implementations of four architectures - UNet, Stormer, Graphcast, and Hierarchical Graphcast, with two boundary conditioning strategies: boundary forcing and coarse-resolution conditioning. For example, to train Graphcast with boundary forcing, run:
+IndiaWeatherBench includes implementations of four architectures - UNet, Stormer, Graphcast, and Hierarchical Graphcast, with two boundary conditioning strategies: boundary forcing and coarse-resolution conditioning. For example, to train Graphcast with boundary forcing, run:
 
 ```bash
 python train_boundary_forcing.py --config configs/boundary_forcing_gc.yaml
