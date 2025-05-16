@@ -1,0 +1,154 @@
+seed_everything: 42
+
+# ---------------------------- TRAINER -------------------------------------------
+trainer:
+  default_root_dir: /eagle/MDClimSim/tungnd/india_benchmark/
+
+  precision: bf16-mixed
+
+  devices: 1
+  num_nodes: 1
+  accelerator: gpu
+  strategy: ddp
+
+  min_epochs: 1
+  max_epochs: 100
+  enable_progress_bar: true
+
+  sync_batchnorm: True
+  enable_checkpointing: True
+  num_sanity_val_steps: 1
+
+  # debugging
+  fast_dev_run: false
+
+  logger:
+    class_path: lightning.pytorch.loggers.wandb.WandbLogger
+    init_args:
+      project: 'india_benchmark'
+      save_dir: ${trainer.default_root_dir}/test
+      name: test
+
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: "step"
+
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        dirpath: "${trainer.default_root_dir}/test/checkpoints"
+        monitor: "val/w_mse_agg" # name of the logged metric which determines when model is improving
+        mode: "min"
+        save_top_k: 1 # save k best models (determined by above metric)
+        save_last: True # additionaly always save model from last epoch
+        verbose: False
+        filename: "epoch_{epoch:03d}"
+        auto_insert_metric_name: False
+
+    # - class_path: lightning.pytorch.callbacks.EarlyStopping
+    #   init_args:
+    #     monitor: "val/loss"
+    #     mode: "min"
+    #     patience: 10 # how many validation epochs of not improving until training stops
+    #     min_delta: 0. # minimum change in the monitored metric needed to qualify as an improvement
+
+    - class_path: lightning.pytorch.callbacks.RichModelSummary
+      init_args:
+        max_depth: -1
+
+    - class_path: lightning.pytorch.callbacks.TQDMProgressBar
+
+# ---------------------------- MODEL -------------------------------------------
+model:
+  img_size: [256, 256]
+  boundary_pixels: 10
+  variables: ${data.variables}
+  vars_to_log: [
+    TMP,
+    UGRD,
+    VGRD,
+    PRMSL,
+    HGT500,
+    TMP_prl850,
+    TMP_prl500,
+    UGRD_prl850,
+    UGRD_prl500,
+    VGRD_prl850,
+    VGRD_prl500,
+    RH850,
+    RH700,
+    RH500
+  ]
+  lr: 2e-4
+  beta_1: 0.9
+  beta_2: 0.95
+  weight_decay: 1e-5
+  warmup_epochs: 10
+  max_epochs: 100
+  warmup_start_lr: 1e-8
+  eta_min: 1e-8
+  net:
+    class_path: india_benchmark.models.networks.stormer.Stormer
+    init_args:
+      in_img_size: ${model.img_size}
+      variables: ${data.variables}
+      n_input_steps: ${data.n_input_steps}
+      patch_size: 2
+      emb_type: "climax"
+      hidden_size: 512
+      depth: 8
+      num_heads: 8
+      drop_rate: 0.0
+
+# ---------------------------- DATA -------------------------------------------
+data:
+  root_dir: /eagle/MDClimSim/tungnd/data/imdaa/imdaa_bench_h5
+  variables: [
+    TMP,
+    UGRD,
+    VGRD,
+    PRMSL,
+    HGT925,
+    HGT850,
+    HGT700,
+    HGT600,
+    HGT500,
+    HGT250,
+    HGT50,
+    TMP_prl925,
+    TMP_prl850,
+    TMP_prl700,
+    TMP_prl600,
+    TMP_prl500,
+    TMP_prl250,
+    TMP_prl50,
+    UGRD_prl925,
+    UGRD_prl850,
+    UGRD_prl700,
+    UGRD_prl600,
+    UGRD_prl500,
+    UGRD_prl250,
+    UGRD_prl50,
+    VGRD_prl925,
+    VGRD_prl850,
+    VGRD_prl700,
+    VGRD_prl600,
+    VGRD_prl500,
+    VGRD_prl250,
+    VGRD_prl50,
+    RH925,
+    RH850,
+    RH700,
+    RH600,
+    RH500,
+    RH250,
+    RH50
+  ]
+  lead_time: 6
+  data_freq: 6
+  n_input_steps: 2
+  n_output_steps: 1
+  n_test_outoput_steps: 12
+  batch_size: 2
+  num_workers: 4
+  pin_memory: False
